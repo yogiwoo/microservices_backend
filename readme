@@ -1,0 +1,16 @@
+chat service port = 6006
+
+auth service port =5005
+
+every users that created locally have same password
+
+Progress
+
+
+==========================================DONE===================================================
+12/7/2025 implemented message api to get messages for a chat session (while clicking a user list)
+
+while creating session the end user must be visible in chat list with empty chat and 
+page shoul automatically render the user in the list
+
+======================================issues -------------------------------------------------------

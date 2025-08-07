@@ -1,0 +1,9 @@
+auth/node_modules
+chat/node_modules
+gateway/node_modules
+
+auth/.env
+
+chat/.env
+
+gateway/.env
