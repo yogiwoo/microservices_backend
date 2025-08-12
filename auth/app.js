@@ -8,7 +8,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //git chnages reflect
 app.get('/welcome-auth',(req,res)=>{
-    console.log("=============================")
     res.send('Welcome to user auth module')
 })
 
@@ -20,7 +19,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions)); // Apply CORS middleware with options
-app.use('/auth',approute)
+app.use('/',approute)
 
 mongoose.connect(process.env.dbURI).then(()=>{
     console.log("DB connection success! connected to mongodb atlas cluster")
