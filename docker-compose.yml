@@ -19,7 +19,7 @@ services:
   
   api-gateway:
     build: ./gateway   # path where your gateway Dockerfile is
-    container_name: api-gateway
+    container_name: gateway
     ports:
       - "3003:8005"   # frontend connects to gateway
     environment:
