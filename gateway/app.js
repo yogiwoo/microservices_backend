@@ -14,6 +14,6 @@ app.use("/chat",createProxyMiddleware({
     pathRewrite:{'^/chat':''}
 }))
 
-app.listen(8080,()=>{
+app.listen(8005,()=>{
     console.log('api gateway is active')
 })

@@ -1,0 +1,30 @@
+services:
+  auth:
+    build: ./auth
+    container_name: auth_service
+    ports:
+      - "3001:5005"
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  chat:
+    build: ./chat
+    container_name: "chat_service"
+    ports: 
+      - "3002:8080"
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+  
+  api-gateway:
+    build: ./gateway   # path where your gateway Dockerfile is
+    container_name: api-gateway
+    ports:
+      - "3003:8005"   # frontend connects to gateway
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - auth
+      - chat
+    restart: unless-stopped

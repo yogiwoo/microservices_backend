@@ -7,6 +7,7 @@ require('dotenv').config()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //git chnages reflect
+console.log("-----database-------",process.env.dbURI)
 app.get('/welcome-auth',(req,res)=>{
     console.log("=============================")
     res.send('Welcome to user auth module')
@@ -23,6 +24,7 @@ app.use(cors(corsOptions)); // Apply CORS middleware with options
 app.use('/auth',approute)
 
 mongoose.connect(process.env.dbURI).then(()=>{
+    console.log("===============>db url",process.env.dbURI);
     console.log("DB connection success! connected to mongodb atlas cluster")
 }).catch((e)=>{
     console.log("DB Error failed to connect",e)
