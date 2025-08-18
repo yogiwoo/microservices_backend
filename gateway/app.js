@@ -3,15 +3,15 @@ const {createProxyMiddleware } =  require("http-proxy-middleware")
 const app=express();
 
 app.use("/auth",createProxyMiddleware({
-    target:'http;//localhost:5005',
+    target:'http://localhost:5005',
     changeOrigin:true,
-    pathRewrite:{'^/auth':''}
+   pathRewrite:{'^/auth':''}
 }))
 
 app.use("/chat",createProxyMiddleware({
-    target:'http;//localhost:6006',
+    target:'http://localhost:8080',
     changeOrigin:true,
-    pathRewrite:{'^/chat':''}
+   pathRewrite:{'^/chat':''}
 }))
 
 app.listen(8005,()=>{

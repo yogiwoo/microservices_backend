@@ -39,7 +39,6 @@ io.on('connection', (socket) => {
         console.log("left room",roomId)
     })
     socket.on('sendMsg', (data) => {
-        console.log("Message sent=====================", data);
         io.to(data.chatId).emit('receiveMsg',data);
     })
 
@@ -50,7 +49,7 @@ io.on('connection', (socket) => {
 
 //app.options('*', cors(corsOptions));
 app.use(cors(corsOptions)); // Apply CORS middleware with options
-app.use('/chat', route);
+app.use('/', route);
 app.get("/getChats", (req, res) => {
     res.send("Hello World from chats");
 });
