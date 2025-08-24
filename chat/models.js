@@ -11,7 +11,7 @@ class ChatModel {
     async searchUsers(data) {
         try {
             const name = data.query.name;
-            const userDetails = await axios.get(`http://localhost:5005/auth/users?name=${name}`);
+            const userDetails = await axios.get(`http://localhost:3003/auth/users?name=${name}`);
             return userDetails.data;
         } catch (error) {
             throw new Error(`Error searching users: ${error.message}`);
@@ -100,13 +100,14 @@ class ChatModel {
         const userIds = chats.map(i => {
             return i.userId.toString()
         })
-        let userArr = await axios.post("http://localhost:5005/auth/getUserArray", userIds,
+        let userArr = await axios.post("http://localhost:3003/auth/getUserArray", userIds,
             {
                 headers: {
                     "Content-Type": "application/json"
                 }
             }
         )
+        console.log(userArr)
         let userMap=new Map()
         for(let i of userArr.data){
             if(userMap.get(i._id)==null){

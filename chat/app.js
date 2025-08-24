@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const server = http.createServer(app);
 const corsOptions = {
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5173", // Adjust this to your frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
