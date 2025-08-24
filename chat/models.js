@@ -100,7 +100,7 @@ class ChatModel {
         const userIds = chats.map(i => {
             return i.userId.toString()
         })
-        let userArr = await axios.post("http://localhost:3003/auth/getUserArray", userIds,
+        let userArr = await axios.post("http://auth:5005/getUserArray", userIds,
             {
                 headers: {
                     "Content-Type": "application/json"

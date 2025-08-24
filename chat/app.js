@@ -26,9 +26,9 @@ app.set('io',io);
 module.exports =app
 
 io.on('connection', (socket) => {
-    socket.on('sendMsg', (data) => {
-    console.log("Message received on server:", data); // <-- this must log
-});
+//     socket.on('sendMsg', (data) => {
+//     console.log("Message received on server:", data); // <-- this must log
+// });
     console.log("User connected", socket.id);
     socket.on('joinRoom',(roomId)=>{
         socket.join(roomId)
@@ -39,6 +39,7 @@ io.on('connection', (socket) => {
         console.log("left room",roomId)
     })
     socket.on('sendMsg', (data) => {
+        console.log("------------------------------------------------------")
         io.to(data.chatId).emit('receiveMsg',data);
     })
 
