@@ -107,7 +107,6 @@ class ChatModel {
                 }
             }
         )
-        console.log(userArr)
         let userMap=new Map()
         for(let i of userArr.data){
             if(userMap.get(i._id)==null){
