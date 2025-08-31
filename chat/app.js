@@ -24,12 +24,19 @@ const io = new Server(server, {
 // Routes
 app.set('io',io);
 module.exports =app
-
+let oUsers=new Map();
 io.on('connection', (socket) => {
 //     socket.on('sendMsg', (data) => {
 //     console.log("Message received on server:", data); // <-- this must log
 // });
     console.log("User connected", socket.id);
+    //{TODO}dont let the register user more than once in the online map 
+    socket.on("registerUser",(userId)=>{
+        console.log("---------------------------------->userId received registerd",userId)
+        oUsers.set(socket.id,userId)
+        console.log("----online users ====",oUsers.values())
+        io.emit('onlineStatus',Array.from(oUsers.values()))
+    })
     socket.on('joinRoom',(roomId)=>{
         socket.join(roomId)
         console.log("joined room",roomId)
@@ -39,12 +46,16 @@ io.on('connection', (socket) => {
         console.log("left room",roomId)
     })
     socket.on('sendMsg', (data) => {
-        console.log("------------------------------------------------------")
         io.to(data.chatId).emit('receiveMsg',data);
     })
 
     socket.on('disconnect', (data) => {
         console.log('user disconnected', socket.id)
+        const userId = oUsers.get(socket.id);
+        oUsers.delete(socket.id);
+        // Broadcast updated online users
+        io.emit('onlineStatus', Array.from(oUsers.values()));
+
     })
 })
 

@@ -1,6 +1,8 @@
  const express=require("express")
 const ChatModel=require("./models")
 const router=express.Router()
+const chatSchema=require("./chatModel")
+const ObjectId=require("mongoose").Types.ObjectId;
 const x=new ChatModel()
 const authorization = require("./passport")
 //if chat instance is not present in database
@@ -24,7 +26,20 @@ router.post("/sendMessage",authorization,async (req,res)=>{
     const io=req.app.get('io');
    
     const msg=await x.sendMessage(req);
-    io.to(req.body.chatId).emit('receiveMsg',msg);
+    const xyt=await chatSchema.updateOne({_id:new ObjectId(req.body.chatId)},
+    
+    {$set:{lastMsg:msg.message,updatedAt:new Date()}});
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",xyt)
+    const emitData = {
+        chatId: req.body.chatId.toString(),
+        message: msg.message,
+        sender: msg.sender.toString(),
+        createdAt: msg.createdAt,
+        updatedAt: msg.updatedAt,
+        _id: msg._id.toString()
+    };
+    //io.to(req.body.chatId).emit('receiveMsg',{...msg,chatId: req.body.chatId});
+    io.to(req.body.chatId).emit('receiveMsg',emitData);
     res.json({message:'Message sent',data:msg});
 })
 router.get("/getMyMessage",authorization,async (req,res)=>{
