@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', (data) => {
         console.log('user disconnected', socket.id)
-        const userId = oUsers.get(socket.id);
+        const userId = oUsers.get(socket.id); //online users
         oUsers.delete(socket.id);
         // Broadcast updated online users
         io.emit('onlineStatus', Array.from(oUsers.values()));

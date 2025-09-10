@@ -40,6 +40,7 @@ class ChatModel {
     }
     //return chat sessions of the logged in user
     async myChats(req) {
+        console.log("Fetching chats for user::::::::::::::::", req.userId);
         // try {
         const userId = req.userId; // Get userId from the request (set by auth middleware)
         if (!userId) {
@@ -60,15 +61,6 @@ class ChatModel {
                     members: { $ne: new ObjectId(userId) }
                 }
             },
-            // {
-            //     $lookup: {
-            //         from: "users",
-            //         localField: "members",
-            //         foreignField: "_id",
-            //         as: "user"
-            //     }
-            // },
-            // { $unwind: '$user' },
             {
                 $lookup: {
                     from: "messages",
@@ -87,8 +79,8 @@ class ChatModel {
                     // userName: "$user.name",
                     // image: "$user.image",
                     userId: "$members",
-                    lastMsg: "$msg.message",
-                    isRead: "$msg.isRead",
+                    lastMsg: 1,
+                    isRead: 1,
                     createdAt: 1,
                     updatedAt: 1
                 }
@@ -154,6 +146,9 @@ class ChatModel {
     async getMessages(data) {
         console.log("Fetching messages for chat:", data.query.chatId);
         const messages = await messageModel.find({ chatId: new ObjectId(data.query.chatId) }).sort({ _id: 1 })
+        //also update is read status of chat session
+        const updation=await ChatSession.updateOne({_id:new ObjectId(data.query.chatId)},{$set:{isRead:true,updatedAt:new Date()}})
+        console.log("========================================updation",updation)
         if (messages.length === 0) {
             return [];
         }

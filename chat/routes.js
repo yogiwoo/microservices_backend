@@ -23,19 +23,21 @@ router.get("/getMyChats",authorization,async (req,res)=>{
     res.json({message:"My chats",chats:chats})
 })
 router.post("/sendMessage",authorization,async (req,res)=>{
+    console.log("send message body",req,body)
     const io=req.app.get('io');
    
     const msg=await x.sendMessage(req);
     const xyt=await chatSchema.updateOne({_id:new ObjectId(req.body.chatId)},
     
-    {$set:{lastMsg:msg.message,updatedAt:new Date()}});
-    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",xyt)
+    {$set:{lastMsg:msg.message,updatedAt:new Date(),isRead:false}});
+   
     const emitData = {
         chatId: req.body.chatId.toString(),
         message: msg.message,
         sender: msg.sender.toString(),
         createdAt: msg.createdAt,
         updatedAt: msg.updatedAt,
+        isRead: false,
         _id: msg._id.toString()
     };
     //io.to(req.body.chatId).emit('receiveMsg',{...msg,chatId: req.body.chatId});

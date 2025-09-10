@@ -3,6 +3,7 @@ const Oid=mongoose.Types.ObjectId;
 const schema =new mongoose.Schema({
     members:[{type:Oid,default:null}],
     lastMsg:{type:String,default:""},
+    isRead:{type:Boolean,default:false},
     createdAt:Date,
     updatedAt:Date
 })
