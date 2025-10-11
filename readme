@@ -1,7 +1,82 @@
-chat service port = 6006
+# 🧱 Microservices Chat Backend
 
-auth service port =5005
+A **Node.js-based microservices backend** designed to demonstrate how scalable, modular, and containerized systems can be built using **Express.js**, **Docker**, and **JWT authentication** — with each service maintaining its **own dedicated database**.
 
-every users that created locally have same password
+This project showcases how backend developers can structure independent services (Auth, Chat, and Gateway) with separate data stores, enabling scalability and fault isolation.
 
+---
 
+## 🚀 Tech Stack
+
+| Category | Technology |
+|-----------|-------------|
+| Language | Node.js (ES Modules) |
+| Framework | Express.js |
+| Architecture | Microservices |
+| Services | Auth Service • Chat Service • Gateway Service |
+| Communication | REST APIs |
+| Authentication | JWT (JSON Web Token) |
+| Containerization | Docker & Docker Compose |
+| Databases | Separate DBs per Service (Auth DB & Chat DB) |
+| Future Enhancements | Redis • Kafka • Swagger • Tests |
+
+---
+
+## 🧩 Microservices Overview
+
+### 1️⃣ Auth Service — Port `5005`
+Handles user registration, login, and JWT generation.  
+Each user’s data is stored in **its own Auth database**.
+
+**Key Responsibilities**
+- Register and authenticate users  
+- Issue and verify JWT tokens  
+- Manage user records in `auth_db`  
+
+---
+
+### 2️⃣ Chat Service — Port `6006`
+Manages chat messages and real-time communication.  
+Uses a **separate Chat database** to store messages and conversations.
+
+**Key Responsibilities**
+- Send and receive chat messages  
+- Store messages in `chat_db`  
+- (Future) Implement WebSocket support for real-time updates  
+
+---
+
+### 3️⃣ Gateway Service — Port `8000`
+Acts as the single entry point for client requests, forwarding them to respective services.
+
+**Key Responsibilities**
+- Routes requests to `Auth` or `Chat` services  
+- Verifies JWT tokens before forwarding  
+- Simplifies API exposure for frontend clients  
+
+---
+
+## 🗄️ Database Isolation
+
+Each service manages its **own database connection** and schema.
+
+| Service | Database | Description |
+|----------|-----------|-------------|
+| Auth Service | `auth_db` | Stores user credentials, tokens, and account info |
+| Chat Service | `chat_db` | Stores messages, conversations, and sender metadata |
+
+**Why separate DBs?**  
+✅ Loose coupling — services evolve independently  
+✅ Improved scalability and fault tolerance  
+✅ Easier database migration and scaling per service  
+
+---
+
+## 🐳 Running the Project
+
+Make sure you have **Docker** and **Docker Compose** installed.
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/yogiwoo/microservices_backend.git
+cd microservices_backend
