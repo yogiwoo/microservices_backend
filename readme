@@ -80,3 +80,6 @@ Make sure you have **Docker** and **Docker Compose** installed.
 ```bash
 git clone https://github.com/yogiwoo/microservices_backend.git
 cd microservices_backend
+
+frontend repo 
+https://github.com/yogiwoo/chat.git
