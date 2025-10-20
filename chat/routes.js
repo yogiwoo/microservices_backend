@@ -46,6 +46,6 @@ router.post("/sendMessage",authorization,async (req,res)=>{
 })
 router.get("/getMyMessage",authorization,async (req,res)=>{
     const data=await x.getMessages(req);
-    res.json({message:"All messages",data:data});
+    res.json({message:"All messages",data:data.messages,totalMessages:data.totalMessages});
 })
 module.exports=router;

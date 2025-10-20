@@ -156,7 +156,8 @@ class ChatModel {
         if (messages.length === 0) {
             return [];
         }
-        return messages.reverse();
+        let totalMsg=await messageModel.countDocuments({ chatId: new ObjectId(data.query.chatId) });
+        return { messages: messages.reverse(), totalMessages: totalMsg };
     }
 }
 
