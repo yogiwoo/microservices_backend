@@ -6,7 +6,6 @@ require('dotenv').config();
 const route = require("./routes");
 const mongoose = require("mongoose")
 const cors = require("cors")
-require("dotenv").config()
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,15 +25,11 @@ app.set('io',io);
 module.exports =app
 let oUsers=new Map();
 io.on('connection', (socket) => {
-//     socket.on('sendMsg', (data) => {
-//     console.log("Message received on server:", data); // <-- this must log
-// });
+
     console.log("User connected", socket.id);
     //{TODO}dont let the register user more than once in the online map 
     socket.on("registerUser",(userId)=>{
-        console.log("---------------------------------->userId received registerd",userId)
         oUsers.set(socket.id,userId)
-        console.log("----online users ====",oUsers.values())
         io.emit('onlineStatus',Array.from(oUsers.values()))
     })
     socket.on('joinRoom',(roomId)=>{

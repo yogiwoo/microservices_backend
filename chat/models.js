@@ -145,14 +145,18 @@ class ChatModel {
     }
     async getMessages(data) {
         console.log("Fetching messages for chat:", data.query.chatId);
-        const messages = await messageModel.find({ chatId: new ObjectId(data.query.chatId) }).sort({ _id: 1 })
+        //Paginated message chunk wise
+        let limit =10
+        let page=data.query.page || 1
+        let skip=(page-1)*limit
+        const messages = await messageModel.find({ chatId: new ObjectId(data.query.chatId) }).sort({ _id: -1 }).limit(limit).skip(skip)
         //also update is read status of chat session
         const updation=await ChatSession.updateOne({_id:new ObjectId(data.query.chatId)},{$set:{isRead:true,updatedAt:new Date()}})
-        console.log("========================================updation",updation)
+       
         if (messages.length === 0) {
             return [];
         }
-        return messages;
+        return messages.reverse();
     }
 }
 
