@@ -1,7 +1,48 @@
-chat service port = 6006
+Real-Time Chat App – Microservices Architecture
 
-auth service port =5005
+A project to explore real-time data transfer, WebSockets, and scalable microservice architecture. 
+Initially inspired by a full-stack real-time chat application course on Udemy, this project is an advanced, self-built version designed with scalability and DevOps in mind.
 
-every users that created locally have same password
+MY GOALS
+-> Build a scalable real-time chat app using microservices architecture
+-> Simulate and handle high traffic locally
+-> Integrate modern scalability tools: Redis , RabbitMQ
+-> Implement DevOps practices
+-> getting comfortable with socket.io
+-> Develop an understanding of system scalability patterns
 
 
+CURRENT FEATURES
+-> real time chatting with one to one user
+-> side bar updates with latest message from each chat in real time
+-> message presistance in mongodb
+-> auth using jwt and passport.js
+-> password encryption using bcrypt
+
+PROJECT SETUP
+-> All microservices are part of a monorepo (for demonstration purposes).
+-> clone the repo
+-> add .env files to each service and add the following variables
+
+    port = 8080
+    dbURI=''
+    JWT_SECRET=''
+
+-> start the all services -> docker compose up
+
+----------------------------------------------------------------------------------------------- FRONTEND ------------------------------------------------------------------------------------------------------------------------
+
+The frontend app is in separate repo
+-> just clone the app from https://github.com/yogiwoo/chat.git 
+-> run via  "npm run dev"
+
+Make sure you ahve docker running
+Node version -> 22.18.0
+
+Tech Stack
+
+-> Frontend: React, Bootstrap
+-> Backend: Node.js, Express.js
+-> Database: MongoDB
+-> Real-time: Socket.IO
+-> Containerization: Docker, Docker Compose
