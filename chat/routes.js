@@ -23,7 +23,6 @@ router.get("/getMyChats",authorization,async (req,res)=>{
     res.json({message:"My chats",chats:chats})
 })
 router.post("/sendMessage",authorization,async (req,res)=>{
-    console.log("send message body",req,body)
     const io=req.app.get('io');
    
     const msg=await x.sendMessage(req);
