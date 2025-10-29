@@ -4,10 +4,33 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 const messageModel = require("./message");
 const { io } = require("./app");
+const { client } = require("./redisManager"); // Import the connected client
 class ChatModel {
     constructor() {
         // Initialize any required properties
     }
+    async redisConn(data){
+        //for testing redis connection and getting data from redis instance
+        try {
+            console.log("Redis test for key:", data.query.key)
+            
+            // Check if key exists and its type
+            const exists = await client.exists(data.query.key);
+           
+            if (!exists) {
+                return { message: "Key does not exist", exists: false };
+            }
+            const type = await client.type(data.query.key);
+            const listdata=await client.json.get(data.query.key);
+            return listdata;
+        } catch (error) {
+            console.error("Redis error:", error);
+            return { error: error.message };
+        }
+    }
+    
+    // Helper method to delete/clear a key
+    
     async searchUsers(data) {
         try {
             const name = data.query.name;
@@ -40,85 +63,98 @@ class ChatModel {
     }
     //return chat sessions of the logged in user
     async myChats(req) {
-        console.log("Fetching chats for user::::::::::::::::", req.userId);
-        // try {
-        const userId = req.userId; // Get userId from the request (set by auth middleware)
-        if (!userId) {
-            throw new Error('User ID not found');
-        }
-
-        let query = [
-            {
-                $match: {
-                    members: new ObjectId(userId)
-                }
-            },
-            {
-                $unwind: "$members"
-            },
-            {
-                $match: {
-                    members: { $ne: new ObjectId(userId) }
-                }
-            },
-            {
-                $lookup: {
-                    from: "messages",
-                    let: { chatId: "$_id" },
-                    pipeline: [
-                        { $match: { $expr: { $eq: ["$chatId", "$$chatId"] } } },
-                        { $sort: { createdAt: -1 } }, // Sort by latest
-                        { $limit: 1 } // Only the latest message
-                    ],
-                    as: "msg"
-                }
-            },
-            { $unwind: { path: "$msg", preserveNullAndEmptyArrays: true } },
-            {
-                $project: {
-                    // userName: "$user.name",
-                    // image: "$user.image",
-                    userId: "$members",
-                    lastMsg: 1,
-                    isRead: 1,
-                    createdAt: 1,
-                    updatedAt: 1
-                }
+       // console.log("Fetching chats for user::::::::::::::::", req.userId);
+       // first check the redis memeory if the chatlist is exists or not of the req.userId
+       let data=await client.exists(req.userId)
+       console.log("*got from redis*",data)
+       if(data){
+        
+        return client.json.get(req.userId);
+       }
+       else{
+        console.log("=====================from api")
+           // try {
+            const userId = req.userId; // Get userId from the request (set by auth middleware)
+            if (!userId) {
+                throw new Error('User ID not found');
             }
-        ];
-        //include user details in the chat session from auth user POST API
-        const chats = await ChatSession.aggregate(query);
-
-        const userIds = chats.map(i => {
-            return i.userId.toString()
-        })
-        let userArr = await axios.post("http://auth:5005/getUserArray", userIds,
-            {
-                headers: {
-                    "Content-Type": "application/json"
+    
+            let query = [
+                {
+                    $match: {
+                        members: new ObjectId(userId)  // need to be indxed
+                    }
+                },
+                {
+                    $unwind: "$members"
+                },
+                {
+                    $match: {
+                        members: { $ne: new ObjectId(userId) }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "messages",
+                        let: { chatId: "$_id" },
+                        pipeline: [
+                            { $match: { $expr: { $eq: ["$chatId", "$$chatId"] } } },
+                            { $sort: { createdAt: -1 } }, // Sort by latest
+                            { $limit: 1 } // Only the latest message
+                        ],
+                        as: "msg"
+                    }
+                },
+                { $unwind: { path: "$msg", preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        // userName: "$user.name",
+                        // image: "$user.image",
+                        userId: "$members",
+                        lastMsg: 1,
+                        isRead: 1,
+                        createdAt: 1,
+                        updatedAt: 1
+                    }
                 }
+            ];
+            //include user details in the chat session from auth user POST API
+            const chats = await ChatSession.aggregate(query);
+    
+            const userIds = chats.map(i => {
+                return i.userId.toString()
+            })
+            let userArr = await axios.post("http://auth:5005/getUserArray", userIds,
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            )
+            let userMap=new Map()
+            for(let i of userArr.data){
+                if(userMap.get(i._id)==null){
+                    userMap.set(i._id,{name:i.name,image:i.image})
+                }
+                  userMap.set(i._id,{name:i.name,image:i.image})
             }
-        )
-        let userMap=new Map()
-        for(let i of userArr.data){
-            if(userMap.get(i._id)==null){
-                userMap.set(i._id,{name:i.name,image:i.image})
-            }
-              userMap.set(i._id,{name:i.name,image:i.image})
-        }
-
-        let finalObject=chats.map(i=>{
-           const userData = userMap.get(i.userId.toString()) || {};
-            return {
-                ...i,
-                userName:userData.name,
-                image:userData.image
-            }
-        })
-        return finalObject;
-        // } catch (error) {
-        //     throw new Error(`Error fetching chats: ${error.message}`);
-        // }
+    
+            let finalObject=chats.map(i=>{
+               const userData = userMap.get(i.userId.toString()) || {};
+                return {
+                    ...i,
+                    userName:userData.name,
+                    image:userData.image
+                }
+            })
+            console.log("00000000000000000000000000000000000000000000000",req.userId)
+            await client.json.set(req.userId,'$',finalObject);
+            await client.expire(req.userId,3*24*60*60);
+            return finalObject;
+            // } catch (error) {
+            //     throw new Error(`Error fetching chats: ${error.message}`);
+            // }
+       }
     }
     async sendMessage(data) {
         console.log("message received");
@@ -144,7 +180,6 @@ class ChatModel {
         }
     }
     async getMessages(data) {
-        console.log("Fetching messages for chat:", data.query.chatId);
         //Paginated message chunk wise
         let limit =10
         let page=data.query.page || 1
@@ -154,7 +189,7 @@ class ChatModel {
         const updation=await ChatSession.updateOne({_id:new ObjectId(data.query.chatId)},{$set:{isRead:true,updatedAt:new Date()}})
        
         if (messages.length === 0) {
-            return [];
+            return { messages: [], totalMessages:0}
         }
         let totalMsg=await messageModel.countDocuments({ chatId: new ObjectId(data.query.chatId) });
         return { messages: messages.reverse(), totalMessages: totalMsg };

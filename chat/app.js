@@ -6,6 +6,8 @@ require('dotenv').config();
 const route = require("./routes");
 const mongoose = require("mongoose")
 const cors = require("cors")
+const {redisConnection}=require("./redisManager");
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -67,7 +69,15 @@ mongoose.connect(process.env.dbURI).then(() => {
     console.log("Problem while connecting with mongodb",error)
 })
 
-server.listen(process.env.port, () => {
-    console.log('chat service is running at port', process.env.port)
+// Connect to Redis and start server
+redisConnection().then(() => {
+    server.listen(process.env.port, () => {
+        console.log('chat service is running at port', process.env.port)
+    })
+}).catch((error) => {
+    console.log("Redis connection failed, starting without cache:", error)
+    server.listen(process.env.port, () => {
+        console.log('chat service is running at port', process.env.port)
+    })
 })
 // Connect to MongoDB

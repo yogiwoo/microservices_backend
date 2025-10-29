@@ -47,4 +47,20 @@ router.get("/getMyMessage",authorization,async (req,res)=>{
     const data=await x.getMessages(req);
     res.json({message:"All messages",data:data.messages,totalMessages:data.totalMessages});
 })
+router.get("/redisConn",async (req,res)=>{
+    const data=await x.redisConn(req);
+    res.json({message:"Redis connection",data:data});
+})
+
+// Helper routes for Redis debugging
+router.post("/clearRedisKey",async (req,res)=>{
+    const data=await x.clearRedisKey(req);
+    res.json({message:"Clear Redis key",data:data});
+})
+
+router.post("/setRedisKey",async (req,res)=>{
+    const data=await x.setRedisKey(req);
+    res.json({message:"Set Redis key",data:data});
+})
+
 module.exports=router;
