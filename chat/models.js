@@ -179,6 +179,49 @@ class ChatModel {
             return { error: `Error sending message: ${Error.message}` };
         }
     }
+
+    async updateRedisCache(chatId, messageData, userId) {
+        try {
+            // Get the chat session to find both users
+            const chatSession = await ChatSession.findById(chatId);
+            if (!chatSession) {
+                console.log("Chat session not found");
+                return;
+            }
+
+            const members = chatSession.members.map(m => m.toString());
+            
+            // Update cache for both users in the chat
+            for (const memberId of members) {
+                const exists = await client.exists(memberId);
+                if (exists) {
+                    // Get the current chat list
+                    const chatList = await client.json.get(memberId);
+                    
+                    // Find and update the specific chat
+                    const updatedChatList = chatList.map(chat => {
+                        // Match by _id (which is the chatId)
+                        if (chat._id && chat._id.toString() === chatId.toString()) {
+                            return {
+                                ...chat,
+                                lastMsg: messageData.message,
+                                updatedAt: new Date().toISOString(),
+                                isRead: false
+                            };
+                        }
+                        return chat;
+                    });
+                    
+                    // Save updated list back to Redis
+                    await client.json.set(memberId, '$', updatedChatList);
+                    await client.expire(memberId, 3*24*60*60);
+                    console.log(`Updated Redis cache for user: ${memberId}`);
+                }
+            }
+        } catch (error) {
+            console.log("Error updating Redis cache:", error);
+        }
+    }
     async getMessages(data) {
         //Paginated message chunk wise
         let limit =10

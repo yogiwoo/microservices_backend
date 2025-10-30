@@ -24,11 +24,15 @@ router.get("/getMyChats",authorization,async (req,res)=>{
 })
 router.post("/sendMessage",authorization,async (req,res)=>{
     const io=req.app.get('io');
+    console.log("=== Request Body ===", req.body);
    
     const msg=await x.sendMessage(req);
     const xyt=await chatSchema.updateOne({_id:new ObjectId(req.body.chatId)},
     
     {$set:{lastMsg:msg.message,updatedAt:new Date(),isRead:false}});
+   
+    // Update Redis cache for both users
+    await x.updateRedisCache(req.body.chatId, msg, req.userId);
    
     const emitData = {
         chatId: req.body.chatId.toString(),
