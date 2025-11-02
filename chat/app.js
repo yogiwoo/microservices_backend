@@ -45,6 +45,14 @@ io.on('connection', (socket) => {
     socket.on('sendMsg', (data) => {
         io.to(data.chatId).emit('receiveMsg',data);
     })
+    socket.on('typing',(data)=>{
+        console.log('------------------------------------->someone is typing')
+        socket.to(data.chatId).emit('display_typing',{userName:data.userName})
+    })
+    socket.on('stop-typing',(data)=>{
+        console.log('-------user stopped typing');
+        socket.to(data.chatId).emit('stop-typing',{userName:data.userName})
+    })
 
     socket.on('disconnect', (data) => {
         console.log('user disconnected', socket.id)
