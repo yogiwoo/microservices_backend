@@ -68,6 +68,8 @@ io.on('connection', (socket) => {
 app.use(cors(corsOptions)); // Apply CORS middleware with options
 app.use('/', route);
 app.get("/getChats", (req, res) => {
+    console.log("get chats request received",process.env.HOSTNAME)
+    console.log("get chats request received",process.env.INSTANCE_NAME)
     res.send("Hello World from chats");
 });
 
