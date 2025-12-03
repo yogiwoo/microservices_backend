@@ -14,6 +14,8 @@ MY GOALS
 
 CURRENT FEATURES
 -> real time chatting with one to one user
+-> online status
+->typing indicators
 -> side bar updates with latest message from each chat in real time
 -> message presistance in mongodb
 -> auth using jwt and passport.js
