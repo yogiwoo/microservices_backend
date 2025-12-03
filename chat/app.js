@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const server = http.createServer(app);
 const corsOptions = {
-    origin: "http://localhost:5173", // Adjust this to your frontend URL
+    origin: ["http://localhost:5173", "http://localhost:4000", "http://localhost:3003"],  // Allow nginx and gateway proxy
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
